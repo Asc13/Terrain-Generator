@@ -1,0 +1,172 @@
+<?xml version="1.0" ?>
+<project name="Procedural Terrain Gen" width="1920" height="1080">
+	<assets>
+		<attributes>
+			<attribute type="RENDERER" name="uDetail" data="INT" value=20 />
+			<attribute type="RENDERER" name="scale" data="FLOAT" value=1.00/>
+			<attribute type="RENDERER" name="amplitude" data="FLOAT" value=0.5/>
+			<attribute type="RENDERER" name="lacunarity" data="FLOAT" value=1.0/>
+			<attribute type="RENDERER" name="gain" data="FLOAT" value=0.0/>
+			<attribute type="RENDERER" name="frequency" data="FLOAT" value=1.0/>
+			<attribute type="RENDERER" name="octaves" data="INT" value=4/>
+			<attribute type="RENDERER" name="opacity" data="FLOAT" value=0.3/>
+			<attribute type="RENDERER" name="fog_density" data="FLOAT" value=0.02/>
+			<attribute type="RENDERER" name="min_h" data="FLOAT" value=0.0/>
+			<attribute type="RENDERER" name="firstLayer" data="FLOAT" value=0.15/>
+			<attribute type="RENDERER" name="secondLayer" data="FLOAT" value=0.4/>
+			<attribute type="RENDERER" name="thirdLayer" data="FLOAT" value=0.9/>
+			<attribute type="RENDERER" name="waterColor" data="VEC4" x="0.058" y="0.368" z="0.611" w="1.0"/>
+			<attribute type="RENDERER" name="firstColor" data="VEC4" x="0.796" y="0.796" z="0.521" w="1.0"/>
+			<attribute type="RENDERER" name="secondColor" data="VEC4" x="0.266" y="0.411" z="0.239" w="1.0"/>
+			<attribute type="RENDERER" name="thirdColor" data="VEC4" x="0.286" y="0.235" z="0.235" w="1.0"/>
+			<attribute type="RENDERER" name="fourthColor" data="VEC4" x="0.870" y="0.870" z="0.870" w="1.0"/>
+			<attribute type="RENDERER" name="skyColor" data="VEC4" x="0.8" y="1.0" z="1.0" w="1.0"/>
+			<attribute type="RENDERER" name="noWater" data="INT" value=1/>
+			<attribute type="RENDERER" name="fogColor" data="VEC4" x="0.5" y="0.6" z="0.7" w="1.0"/>
+		</attributes>
+		
+		<scenes>
+			<scene name="terrain_scene">
+				<buffers name="terrain_buffer" primitive="POINTS" material="terrain_mat" >
+					<position name="point" fromLibrary="TerrainLib" />
+				</buffers>
+			</scene>
+
+			<scene name="water_scene">
+				<buffers name="water_buffer" primitive="POINTS" material="water_mat" >
+					<position name="point" fromLibrary="TerrainLib" />
+				</buffers>
+			</scene>
+		</scenes>
+
+		<viewports>
+			<viewport name="MainViewport">
+				<CLEAR_COLOR r="0.8" g="1.0" b="1.0" />
+			</viewport>
+		</viewports>
+		
+		<cameras>
+			<camera name="MainCamera" >
+				<viewport name="MainViewport" />
+				<projection TYPE="PERSPECTIVE" FOV=60.0 NEAR=0.1 FAR=50.0 />
+				<POSITION x=0.0 y=3.0 z=0.0 />
+				<VIEW x=0.0 y=0.0 z=-1.0 />
+				<UP x=0 y=1 z=0 />
+			</camera>
+		</cameras>
+		
+		<lights>
+			<light name="Sun">
+				<DIRECTION x="0.0" y="10.0" z="-10.0" />
+			</light>
+		</lights>
+		
+		<materialLibs>
+			<materialLib filename="terrain.mlib"/>
+		</materialLibs>
+		
+	</assets>
+	
+	<pipelines>
+		<pipeline name="terrain_pipeline" default="true">
+
+			<pass class="default" name="terrain_pass">
+				<scenes instances = 625>
+					<scene name="terrain_scene" />
+					<scene name="water_scene" />
+				</scenes>
+				<camera name="MainCamera" />
+				<lights>
+					<light name="Sun" />
+				</lights>
+				<materialMaps>
+					<map fromMaterial="terrain_mat" toMaterial="terrain_mat" toLibrary="TerrainLib" />
+					<map fromMaterial="water_mat" toMaterial="water_mat" toLibrary="TerrainLib" />
+				</materialMaps>
+
+			</pass>
+		</pipeline>
+	</pipelines>
+	
+	<interface>
+
+		<window label="Terrain Effects">
+			<var label="uDetail" type="RENDERER" context="CURRENT" 
+					component="uDetail" def="min=20 max=64 step=1"/>
+
+			<var label="scale" type="RENDERER" context="CURRENT" 
+					component="scale" def="min=0.1 max=5 step=0.1" />
+
+			<var label="amplitude" type="RENDERER" context="CURRENT" 
+					component="amplitude" def="min=0.1 max=1 step=0.1" />
+
+			<var label="octaves" type="RENDERER" context="CURRENT" 
+					component="octaves" def="min=2 max=16 step=1" />
+										
+			<var label="min_h" type="RENDERER" context="CURRENT" 
+					component="min_h" def="min=-0.15 max=0.15 step=0.01" />
+
+			<var label="lacunarity" type="RENDERER" context="CURRENT" 
+					component="lacunarity" def="min=0.0 max=10.0 step=0.1" />
+
+			<var label="gain" type="RENDERER" context="CURRENT" 
+					component="gain" def="min='-1.0' max=1.0 step=0.1" />
+
+			<var label="frequency" type="RENDERER" context="CURRENT" 
+					component="frequency" def="min=0.0 max=10.0 step=0.1" />
+		</window>
+
+		<window label="Water Effects">
+			<var label="waterColor" type="RENDERER" context="CURRENT"
+				 component="waterColor" mode="COLOR" />
+
+			<var label="noWater" type="RENDERER" context="CURRENT"
+				 component="noWater" def="min=0 max=1 step=1" />
+
+			<var label="opacity" type="RENDERER" context="CURRENT" 
+					component="opacity" def="min=0.3 max=0.5 step=0.1" />
+		</window>
+
+		<window label="Fog Effects">
+			<var label="fog_density" type="RENDERER" context="CURRENT" 
+					component="fog_density" def="min=0 max=0.1 step=0.01" />
+
+			<var label="fogColor" type="RENDERER" context="CURRENT"
+				 component="fogColor" mode="COLOR" />
+		</window>
+		
+		<window label="Layers Effects">
+			<var label="firstColor" type="RENDERER" context="CURRENT"
+				 component="firstColor" mode="COLOR" />
+
+			<var label="secondColor" type="RENDERER" context="CURRENT"
+				 component="secondColor" mode="COLOR" />
+
+			<var label="thirdColor" type="RENDERER" context="CURRENT"
+				 component="thirdColor" mode="COLOR" />
+
+			<var label="fourthColor" type="RENDERER" context="CURRENT"
+				 component="fourthColor" mode="COLOR" />
+
+			<var label="firstLayer" type="RENDERER" context="CURRENT" 
+					component="firstLayer" def="min=0.15 max=0.4 step=0.01" />
+
+			<var label="secondLayer" type="RENDERER" context="CURRENT" 
+					component="secondLayer" def="min=0.4 max=0.9 step=0.01" />
+
+			<var label="thirdLayer" type="RENDERER" context="CURRENT" 
+					component="thirdLayer" def="min=0.9 max=1 step=0.01" />
+		</window>
+
+		<window label="Light Effects">
+            <var label="Light Color" type="LIGHT" context="Sun" component="COLOR" mode="COLOR"/>
+            <var label="Light Dir" type="LIGHT" context="Sun" component="DIRECTION" mode="DIRECTION"/>
+		</window>
+
+		<window label="Sky Effects">
+            <var label="skyColor" type="VIEWPORT" context="MainViewport"
+				 component="CLEAR_COLOR" mode="COLOR" />
+		</window>
+	</interface>
+	
+</project>
